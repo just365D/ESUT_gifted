@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>阿煌的密室逃脫任務 — 鑰匙線索站</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;700;900&family=Noto+Sans+TC:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#EEF3F1; --surface:#FFFFFF; --surface-2:#E2E9E5; --surface-console:#16242A;
+    --ink:#16242A; --ink-soft:#4C6066; --ink-faint:#7C8E8A; --border:#CFDAD4;
+    --accent-gold:#B8791E; --accent-gold-soft:#F1DFB9;
+    --accent-teal:#146B6E; --accent-teal-soft:#D8ECEA;
+    --accent-rose:#A6433A; --accent-rose-soft:#F1DAD6;
+    --success:#2F7D4F; --danger:#B23B34; --focus:#146B6E;
+    --shadow: 0 1px 2px rgba(20,40,38,.06), 0 8px 24px -12px rgba(20,40,38,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0E1618; --surface:#17211F; --surface-2:#1E2C2A; --surface-console:#0A1113;
+      --ink:#E7EEEC; --ink-soft:#9FB5B1; --ink-faint:#6E827D; --border:#2A3B38;
+      --accent-gold:#E3A93F; --accent-gold-soft:#3A2E17;
+      --accent-teal:#4FC7C6; --accent-teal-soft:#123332;
+      --accent-rose:#E2837A; --accent-rose-soft:#3A2320;
+      --success:#4FAE78; --danger:#E2837A; --focus:#4FC7C6;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","IBM Plex Mono",system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-inline:20px;}
+  h1,h2,h3,.display{font-family:"Noto Serif TC",serif;text-wrap:balance;margin:0;}
+  code,.mono,.mono *{font-family:"IBM Plex Mono",monospace;}
+  a{color:var(--accent-teal);}
+  button{font-family:inherit;}
+  select,input[type=text]{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+  .wrap{max-width:760px;margin:0 auto;padding-block:22px 60px;}
+  [hidden]{display:none!important;}
+
+  .hero{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-start;justify-content:space-between;padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+  .hero-id{display:flex;align-items:center;gap:14px;}
+  .hero-badge{width:52px;height:52px;border-radius:14px;flex:none;background:linear-gradient(155deg,var(--accent-gold-soft),var(--surface-2));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;}
+  .hero h1{font-size:22px;font-weight:900;letter-spacing:.01em;}
+  .hero p{margin:2px 0 0;color:var(--ink-soft);font-size:13.5px;max-width:46ch;}
+  .role-link{appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--ink-soft);padding:7px 14px;border-radius:10px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .role-link:hover{color:var(--ink);}
+
+  .task-banner{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:22px;box-shadow:var(--shadow);font-size:13.5px;color:var(--ink-soft);line-height:1.6;}
+  .task-banner b{color:var(--ink);}
+
+  .section{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px;}
+  .section-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .section-num{flex:none;width:26px;height:26px;border-radius:8px;background:var(--accent-teal);color:#fff;display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:13px;}
+  .section-title{font-size:16px;font-weight:700;}
+
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  @media (max-width:520px){.field-row{grid-template-columns:1fr;}}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:5px;}
+  .field select,.field input[type=text]{width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-size:14px;}
+
+  .group-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+  .group-card{display:flex;align-items:flex-start;gap:12px;text-align:left;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:13px 14px;cursor:pointer;width:100%;}
+  .group-card input{margin-top:3px;flex:none;accent-color:var(--accent-teal);}
+  .group-card > span{display:flex;flex-direction:column;gap:3px;}
+  .group-card .g-title{font-weight:700;font-size:14.5px;}
+  .group-card .g-sub{font-size:12.5px;color:var(--ink-faint);}
+  .group-card.on{border-color:var(--accent-teal);background:var(--accent-teal-soft);}
+
+  .scenario-select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;}
+
+  .level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  @media (max-width:620px){.level-grid{grid-template-columns:1fr;}}
+  .level-card{display:flex;flex-direction:column;gap:5px;text-align:left;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:13px 13px 12px;cursor:pointer;width:100%;}
+  .level-card input{accent-color:var(--accent-teal);}
+  .level-card .l-title{font-weight:700;font-size:13.5px;}
+  .level-card .l-hint{font-size:12px;color:var(--ink-faint);line-height:1.5;}
+  .level-card.on{border-color:var(--accent-teal);background:var(--accent-teal-soft);}
+
+  .preview-box{background:var(--surface-console);color:#EAF3F1;border-radius:14px;padding:14px 16px;margin-top:4px;display:none;}
+  .preview-box.show{display:block;}
+  .preview-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#8FE0DA;background:rgba(143,224,218,.12);padding:3px 9px;border-radius:99px;margin-bottom:8px;}
+  .preview-text{font-size:14px;line-height:1.7;white-space:pre-wrap;}
+
+  .send-row{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap;}
+  .btn-primary{appearance:none;border:none;background:var(--accent-teal);color:#fff;font-weight:700;font-size:14.5px;padding:11px 22px;border-radius:12px;cursor:pointer;}
+  .btn-primary:disabled{opacity:.55;cursor:default;}
+  .btn-ghost{appearance:none;border:1px solid var(--border);background:transparent;color:var(--ink-soft);font-weight:600;font-size:13.5px;padding:10px 16px;border-radius:12px;cursor:pointer;}
+  .status-msg{font-size:13px;color:var(--ink-faint);}
+  .status-msg.err{color:var(--danger);font-weight:600;}
+
+  .reply-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px;display:none;}
+  .reply-box.show{display:block;}
+  .reply-box h2{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--accent-teal);}
+  .reply-box .answer{font-size:14.5px;line-height:1.85;white-space:pre-wrap;}
+  .reply-box .answer.error{color:var(--danger);}
+
+  .footnote{font-size:12px;color:var(--ink-faint);text-align:center;margin-top:6px;}
+
+  /* ---------- 研究者／教師 頁面 ---------- */
+  .teacher-wrap .section{max-width:none;}
+  .login-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .login-row input{padding:9px 11px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--ink);font-size:14px;min-width:200px;}
+  .cond-pill{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:99px;display:inline-flex;align-items:center;gap:6px;}
+  .cond-pill.full{background:var(--accent-teal-soft);color:var(--accent-teal);}
+  .cond-pill.clue{background:var(--accent-gold-soft);color:var(--accent-gold);}
+  .class-map{display:flex;flex-wrap:wrap;gap:8px;}
+  .class-chip{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:7px 11px;font-size:13px;font-weight:600;}
+  table.rows{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.rows th,table.rows td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top;}
+  table.rows th{color:var(--ink-faint);font-weight:600;position:sticky;top:0;background:var(--surface);}
+  .table-scroll{max-height:480px;overflow:auto;border:1px solid var(--border);border-radius:12px;}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+</style>
+</head>
+<body>
+<div class="wrap" id="studentView">
+  <div class="hero">
+    <div class="hero-id">
+      <div class="hero-badge">🤖</div>
+      <div>
+        <h1>阿煌的密室逃脫任務</h1>
+        <p>選擇關卡目標，讓 AI 小助手陪你想物件、事件、條件、動作和畫面結果。</p>
+      </div>
+    </div>
+    <button class="role-link" id="toTeacher">研究者／教師</button>
+  </div>
+
+  <div class="task-banner">
+    <b>任務：</b>使用 Delightex Edu 與 CoBlocks，設計一個能尋找線索、探索鑰匙、解鎖出口的 3D 密室逃脫作品。
+  </div>
+
+  <div class="section">
+    <div class="section-head"><span class="section-num">1</span><span class="section-title">冒險者資料</span></div>
+    <div class="field-row">
+      <div class="field"><label for="className">班級</label>
+        <select id="className"></select>
+      </div>
+      <div class="field"><label for="seatNumber">座號</label>
+        <select id="seatNumber"></select>
+      </div>
+    </div>
+    <div class="field"><label for="studentName">姓名（完整）</label>
+      <input type="text" id="studentName" placeholder="請輸入完整姓名">
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><span class="section-num">2</span><span class="section-title">選擇現在的關卡</span></div>
+    <div class="group-grid" id="groupGrid"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><span class="section-num">3</span><span class="section-title">關卡目標</span></div>
+    <select class="scenario-select" id="goalSelect"></select>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><span class="section-num">4</span><span class="section-title">選擇你想怎麼學</span></div>
+    <div class="level-grid" id="levelGrid"></div>
+    <div class="preview-box" id="promptBox">
+      <span class="preview-badge">AI 小幫手提示</span>
+      <div class="preview-text" id="promptText"></div>
+    </div>
+    <div class="send-row">
+      <button class="btn-primary" id="send">AI小助手</button>
+      <button class="btn-ghost" id="reset">重新選擇</button>
+      <span class="status-msg" id="status"></span>
+    </div>
+  </div>
+
+  <div class="reply-box" id="replyBox">
+    <h2>AI 小幫手回應</h2>
+    <div class="answer" id="answer"></div>
+  </div>
+
+  <p class="footnote">每次取得 AI 小助手提示時，系統會自動保存學習互動紀錄。</p>
+</div>
+
+<div class="wrap teacher-wrap" id="teacherView" hidden>
+  <div class="hero">
+    <div class="hero-id">
+      <div class="hero-badge">🗝️</div>
+      <div>
+        <h1>研究者／教師頁面</h1>
+        <p>切換任務目標類型條件、查看即時互動紀錄、匯出 CSV。</p>
+      </div>
+    </div>
+    <button class="role-link" id="toStudent">回到學生畫面</button>
+  </div>
+
+  <div class="section" id="loginSection">
+    <div class="section-head"><span class="section-title">研究者登入</span></div>
+    <div class="login-row">
+      <input type="text" id="teacherToken" placeholder="輸入研究者密碼（TEACHER_TOKEN）">
+      <button class="btn-primary" id="loginBtn">登入</button>
+      <span class="status-msg" id="loginStatus"></span>
+    </div>
+  </div>
+
+  <div id="teacherBody" hidden>
+    <div class="section">
+      <div class="section-head"><span class="section-title">班級 → 任務目標類型條件（固定對照，學生畫面不會顯示）</span></div>
+      <div class="class-map" id="classMap"></div>
+      <p style="font-size:12px;color:var(--ink-faint);margin:10px 0 0;">學生選了班級後，條件就自動決定，不需要手動切換。要調整對照表，請改 <code>lib/steps.js</code> 裡的 <code>CLASSES</code>。</p>
+    </div>
+
+    <div class="section">
+      <div class="toolbar">
+        <span class="section-title" style="margin-right:auto">即時互動紀錄</span>
+        <button class="btn-ghost" id="refreshRows">重新整理</button>
+        <button class="btn-primary" id="exportCsv">匯出 CSV</button>
+      </div>
+      <div class="table-scroll">
+        <table class="rows">
+          <thead><tr>
+            <th>時間</th><th>班級</th><th>座號</th><th>姓名</th><th>條件</th><th>關卡</th><th>關卡目標</th><th>方式</th><th>送出訊息</th><th>AI回覆</th>
+          </tr></thead>
+          <tbody id="rowsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let GROUPS = [], STEPS = [], LEVELS = [], CLASSES = [];
+let teacherToken = sessionStorage.getItem('keyclue_teacher_token') || '';
+
+function api(path, opts){
+  opts = opts || {};
+  const headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if (teacherToken) headers['x-teacher-token'] = teacherToken;
+  return fetch(path, Object.assign({}, opts, {headers})).then(async r => {
+    const data = await r.json().catch(()=>({}));
+    if (!r.ok) throw new Error(data.message || ('請求失敗（'+r.status+'）'));
+    return data;
+  });
+}
+
+/* ---------------- 學生畫面 ---------------- */
+function fillProfileSelects(){
+  $('className').innerHTML = '<option value="">請選擇班級</option>' +
+    CLASSES.map(c=>'<option>'+c.code+'</option>').join('');
+  $('seatNumber').innerHTML = '<option value="">請選擇座號</option>' +
+    Array.from({length:30},(_,i)=>String(i+1).padStart(2,'0')).map(n=>'<option>'+n+'</option>').join('');
+  $('className').addEventListener('change', updatePreview);
+}
+
+function renderGroups(){
+  $('groupGrid').innerHTML = GROUPS.map((g,i)=>`
+    <label class="group-card${i===0?' on':''}">
+      <input type="radio" name="group" value="${g.key}" ${i===0?'checked':''}>
+      <span><span class="g-title">${g.title}</span><span class="g-sub">${g.subtitle}</span></span>
+    </label>`).join('');
+  document.querySelectorAll('.group-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('.group-card').forEach(c=>c.classList.remove('on'));
+      card.classList.add('on');
+      card.querySelector('input').checked = true;
+      fillScenarios();
+    });
+  });
+}
+
+function currentGroupKey(){
+  const el = document.querySelector('input[name=group]:checked');
+  return el ? el.value : GROUPS[0].key;
+}
+
+function fillScenarios(){
+  const items = STEPS.filter(s => s.groupKey === currentGroupKey());
+  $('goalSelect').innerHTML = items.map((s,i)=>`<option value="${s.id}">${i+1}. ${s.title}</option>`).join('');
+  hidePreview();
+  updatePreview();
+}
+
+function renderLevels(){
+  $('levelGrid').innerHTML = LEVELS.map((l,i)=>`
+    <label class="level-card${i===0?' on':''}">
+      <input type="radio" name="level" value="${l.key}" ${i===0?'checked':''}>
+      <span class="l-title">${l.studentLabel}</span>
+      <span class="l-hint">${l.hint||''}</span>
+    </label>`).join('');
+  document.querySelectorAll('.level-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('.level-card').forEach(c=>c.classList.remove('on'));
+      card.classList.add('on');
+      card.querySelector('input').checked = true;
+      updatePreview();
+    });
+  });
+}
+
+function currentLevelKey(){
+  const el = document.querySelector('input[name=level]:checked');
+  return el ? el.value : LEVELS[0].key;
+}
+
+let previewSeq = 0;
+function hidePreview(){ $('promptBox').classList.remove('show'); }
+function updatePreview(){
+  const stepId = $('goalSelect').value;
+  const levelKey = currentLevelKey();
+  const className = $('className').value;
+  if (!stepId) return;
+  const seq = ++previewSeq;
+  api('/api/preview?stepId='+encodeURIComponent(stepId)+'&levelKey='+encodeURIComponent(levelKey)+'&className='+encodeURIComponent(className))
+    .then(data=>{
+      if (seq !== previewSeq) return;
+      $('promptText').textContent = data.promptText;
+      $('promptBox').classList.add('show');
+    })
+    .catch(()=>{});
+}
+
+function showStatus(text, bad){
+  const el = $('status');
+  el.textContent = text || '';
+  el.className = 'status-msg' + (bad ? ' err' : '');
+}
+
+function renderReply(text){
+  const escaped = String(text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+}
+
+async function send(){
+  const className = $('className').value;
+  const seatNumber = $('seatNumber').value;
+  const studentName = $('studentName').value.trim();
+  const stepId = $('goalSelect').value;
+  const levelKey = currentLevelKey();
+
+  if (!className) return showStatus('請先選擇班級。', true);
+  if (!seatNumber) return showStatus('請先選擇座號。', true);
+  if (!studentName) return showStatus('請輸入完整姓名。', true);
+
+  $('send').disabled = true;
+  $('replyBox').classList.remove('show');
+  $('answer').className = 'answer';
+  $('answer').textContent = '';
+  showStatus('AI 正在回應，請稍等……');
+
+  try{
+    const data = await api('/api/ask', {
+      method:'POST',
+      body: JSON.stringify({ className, seatNumber, studentName, stepId, levelKey })
+    });
+    $('answer').innerHTML = renderReply(data.aiResponse);
+    if (data.isError) $('answer').className = 'answer error';
+    $('replyBox').classList.add('show');
+    $('replyBox').scrollIntoView({behavior:'smooth', block:'start'});
+    showStatus('');
+  }catch(err){
+    showStatus(err.message || String(err), true);
+  }finally{
+    $('send').disabled = false;
+  }
+}
+
+function resetChoice(){
+  $('answer').textContent = '';
+  $('replyBox').classList.remove('show');
+  hidePreview();
+  showStatus('');
+  $('goalSelect').focus();
+  $('goalSelect').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+/* ---------------- 研究者／教師畫面 ---------------- */
+function renderClassMap(){
+  $('classMap').innerHTML = CLASSES.map(c => `
+    <span class="class-chip">${c.code}
+      <span class="cond-pill ${c.condition}">${c.conditionLabel}</span>
+    </span>`).join('');
+}
+
+async function refreshRows(){
+  try{
+    const rows = await api('/api/interactions?limit=500');
+    $('rowsBody').innerHTML = rows.map(r => `<tr>
+      <td>${r.tsISO ? new Date(r.tsISO).toLocaleString() : ''}</td>
+      <td>${r.className||''}</td><td>${r.seatNumber||''}</td><td>${r.studentName||''}</td>
+      <td>${r.conditionLabel||''}</td><td>${r.groupTitle||''}</td>
+      <td>${r.scenario||r.stepTitle||''}</td><td>${r.levelStudentLabel||''}</td>
+      <td>${(r.promptSent||'').slice(0,60)}</td><td>${(r.aiResponse||'').slice(0,80)}</td>
+    </tr>`).join('');
+  }catch(e){}
+}
+
+async function teacherLogin(){
+  const token = $('teacherToken').value.trim();
+  teacherToken = token;
+  try{
+    await api('/api/interactions?limit=1');
+    sessionStorage.setItem('keyclue_teacher_token', token);
+    $('loginSection').hidden = true;
+    $('teacherBody').hidden = false;
+    refreshRows();
+  }catch(e){
+    $('loginStatus').textContent = e.message || '登入失敗';
+    $('loginStatus').className = 'status-msg err';
+  }
+}
+
+function exportCsv(){
+  const url = '/api/export.csv' + (teacherToken ? ('?token='+encodeURIComponent(teacherToken)) : '');
+  window.location = url;
+}
+
+/* ---------------- 初始化 ---------------- */
+async function init(){
+  const [groups, steps, levels, classes] = await Promise.all([
+    api('/api/groups'), api('/api/steps'), api('/api/levels'), api('/api/classes')
+  ]);
+  GROUPS = groups; STEPS = steps; LEVELS = levels; CLASSES = classes;
+  fillProfileSelects();
+  renderGroups();
+  renderLevels();
+  renderClassMap();
+  fillScenarios();
+
+  $('goalSelect').addEventListener('change', updatePreview);
+  $('send').addEventListener('click', send);
+  $('reset').addEventListener('click', resetChoice);
+
+  $('toTeacher').addEventListener('click', ()=>{ $('studentView').hidden = true; $('teacherView').hidden = false; });
+  $('toStudent').addEventListener('click', ()=>{ $('teacherView').hidden = true; $('studentView').hidden = false; });
+
+  $('loginBtn').addEventListener('click', teacherLogin);
+  $('refreshRows').addEventListener('click', refreshRows);
+  $('exportCsv').addEventListener('click', exportCsv);
+
+  if (teacherToken){
+    $('loginSection').hidden = true;
+    $('teacherBody').hidden = false;
+    refreshRows();
+  }
+}
+init();
+</script>
+</body>
+</html>

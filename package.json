@@ -1,0 +1,20 @@
+{
+  "name": "keyclue-backend",
+  "version": "1.0.0",
+  "description": "鑰匙線索站 — Delightex 程式設計任務 AI 三層級提問後端（Gemini API + Google 試算表）",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.22.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2 || ^5.0.0",
+    "googleapis": "*"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
