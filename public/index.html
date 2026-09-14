@@ -78,6 +78,15 @@
 
   .preview-box{background:var(--surface-console);color:#EAF3F1;border-radius:14px;padding:14px 16px;margin-top:4px;display:none;}
   .preview-box.show{display:block;}
+
+  .level-intro{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:16px;}
+  .level-intro p.lead{margin:0 0 14px;font-size:13px;color:var(--ink-soft);}
+  table.guide{width:100%;border-collapse:collapse;margin-bottom:16px;}
+  table.guide th{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);padding:0 0 8px;border-bottom:1px solid var(--border);}
+  table.guide td{padding:12px 0;border-bottom:1px solid var(--border);vertical-align:top;font-size:13.5px;line-height:1.6;}
+  table.guide tr:last-child td{border-bottom:none;}
+  table.guide td.name{width:32%;font-weight:700;padding-right:14px;}
+  table.guide td.desc{color:var(--ink-soft);}
   .preview-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#8FE0DA;background:rgba(143,224,218,.12);padding:3px 9px;border-radius:99px;margin-bottom:8px;}
   .preview-text{font-size:14px;line-height:1.7;white-space:pre-wrap;}
 
@@ -103,6 +112,8 @@
   .cond-pill{font-size:12.5px;font-weight:700;padding:3px 10px;border-radius:99px;display:inline-flex;align-items:center;gap:6px;}
   .cond-pill.full{background:var(--accent-teal-soft);color:var(--accent-teal);}
   .cond-pill.clue{background:var(--accent-gold-soft);color:var(--accent-gold);}
+  .cond-pill.guided{background:var(--accent-rose-soft);color:var(--accent-rose);}
+  .cond-pill.autonomous{background:var(--surface-2);color:var(--ink-soft);}
   .class-map{display:flex;flex-wrap:wrap;gap:8px;}
   .class-chip{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:7px 11px;font-size:13px;font-weight:600;}
   table.rows{width:100%;border-collapse:collapse;font-size:12.5px;}
@@ -156,15 +167,40 @@
 
   <div class="section">
     <div class="section-head"><span class="section-num">4</span><span class="section-title">選擇你想怎麼學</span></div>
-    <div class="level-grid" id="levelGrid"></div>
-    <div class="preview-box" id="promptBox">
-      <span class="preview-badge">AI 小幫手提示</span>
-      <div class="preview-text" id="promptText"></div>
+
+    <div class="level-intro" id="levelIntro" hidden>
+      <p class="lead">開始選之前，先看看這三種方式分別適合什麼情況：</p>
+      <table class="guide">
+        <thead><tr><th>選項名稱</th><th>學生看到的引導語</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="name">找到程式重點</td>
+            <td class="desc">如果你還不確定這個任務有哪些重要角色、事件、功能，或不知道程式要做到什麼，可以先從這裡開始。</td>
+          </tr>
+          <tr>
+            <td class="name">把重點用在任務中</td>
+            <td class="desc">如果你已經知道重要概念，但還不確定要怎麼放進目前的程式任務中，可以選這個。</td>
+          </tr>
+          <tr>
+            <td class="name">檢查並想新方法</td>
+            <td class="desc">如果你已經做了一部分程式，但想檢查哪裡有問題、比較不同做法，或思考怎麼修改，可以選這個。</td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn-primary" id="levelIntroContinue">我看完了，開始選擇</button>
     </div>
-    <div class="send-row">
-      <button class="btn-primary" id="send">AI小助手</button>
-      <button class="btn-ghost" id="reset">重新選擇</button>
-      <span class="status-msg" id="status"></span>
+
+    <div id="levelMain">
+      <div class="level-grid" id="levelGrid"></div>
+      <div class="preview-box" id="promptBox">
+        <span class="preview-badge">AI 小幫手提示</span>
+        <div class="preview-text" id="promptText"></div>
+      </div>
+      <div class="send-row">
+        <button class="btn-primary" id="send">AI小助手</button>
+        <button class="btn-ghost" id="reset">重新選擇</button>
+        <span class="status-msg" id="status"></span>
+      </div>
     </div>
   </div>
 
@@ -182,7 +218,7 @@
       <div class="hero-badge">🗝️</div>
       <div>
         <h1>研究者／教師頁面</h1>
-        <p>切換任務目標類型條件、查看即時互動紀錄、匯出 CSV。</p>
+        <p>查看班級對照的兩個自變項條件、即時互動紀錄、匯出 CSV。</p>
       </div>
     </div>
     <button class="role-link" id="toStudent">回到學生畫面</button>
@@ -199,9 +235,9 @@
 
   <div id="teacherBody" hidden>
     <div class="section">
-      <div class="section-head"><span class="section-title">班級 → 任務目標類型條件（固定對照，學生畫面不會顯示）</span></div>
+      <div class="section-head"><span class="section-title">班級 → 兩個自變項條件（固定對照，學生畫面不會顯示）</span></div>
       <div class="class-map" id="classMap"></div>
-      <p style="font-size:12px;color:var(--ink-faint);margin:10px 0 0;">學生選了班級後，條件就自動決定，不需要手動切換。要調整對照表，請改 <code>lib/steps.js</code> 裡的 <code>CLASSES</code>。</p>
+      <p style="font-size:12px;color:var(--ink-faint);margin:10px 0 0;">學生選了班級後，「任務目標類型」與「Prompt選擇支援」兩個條件就自動決定，不需要手動切換。引導式班級的學生在第4步會先看到一個引導說明畫面，自主式則直接看到選項卡片。要調整對照表，請改 <code>lib/steps.js</code> 裡的 <code>CLASSES</code>。</p>
     </div>
 
     <div class="section">
@@ -213,7 +249,7 @@
       <div class="table-scroll">
         <table class="rows">
           <thead><tr>
-            <th>時間</th><th>班級</th><th>座號</th><th>姓名</th><th>條件</th><th>關卡</th><th>關卡目標</th><th>方式</th><th>送出訊息</th><th>AI回覆</th>
+            <th>時間</th><th>班級</th><th>座號</th><th>姓名</th><th>任務目標</th><th>Prompt支援</th><th>關卡</th><th>關卡目標</th><th>方式</th><th>送出訊息</th><th>AI回覆</th>
           </tr></thead>
           <tbody id="rowsBody"></tbody>
         </table>
@@ -226,6 +262,7 @@
 const $ = id => document.getElementById(id);
 let GROUPS = [], STEPS = [], LEVELS = [], CLASSES = [];
 let teacherToken = sessionStorage.getItem('keyclue_teacher_token') || '';
+let introDismissed = false; // Prompt選擇支援＝引導式時，是否已經按過「開始選擇」（換班級會重置）
 
 function api(path, opts){
   opts = opts || {};
@@ -244,7 +281,26 @@ function fillProfileSelects(){
     CLASSES.map(c=>'<option>'+c.code+'</option>').join('');
   $('seatNumber').innerHTML = '<option value="">請選擇座號</option>' +
     Array.from({length:30},(_,i)=>String(i+1).padStart(2,'0')).map(n=>'<option>'+n+'</option>').join('');
-  $('className').addEventListener('change', updatePreview);
+  $('className').addEventListener('change', ()=>{
+    introDismissed = false; // 換班級時，若新班級是引導式，重新從引導畫面開始
+    updateLevelStage();
+    updatePreview();
+  });
+}
+
+// Prompt選擇支援（引導式／自主式）依班級查表決定，學生畫面不會顯示這個名稱本身，
+// 只會表現為「選卡片前有沒有先看到引導說明畫面」。
+function supportForClass(code){
+  const found = CLASSES.find(c => c.code === code);
+  return found ? found.support : 'autonomous';
+}
+
+function updateLevelStage(){
+  const code = $('className').value;
+  const support = code ? supportForClass(code) : 'autonomous';
+  const showIntro = support === 'guided' && !introDismissed;
+  $('levelIntro').hidden = !showIntro;
+  $('levelMain').hidden = showIntro;
 }
 
 function renderGroups(){
@@ -373,6 +429,7 @@ function renderClassMap(){
   $('classMap').innerHTML = CLASSES.map(c => `
     <span class="class-chip">${c.code}
       <span class="cond-pill ${c.condition}">${c.conditionLabel}</span>
+      <span class="cond-pill ${c.support}">${c.supportLabel}</span>
     </span>`).join('');
 }
 
@@ -382,7 +439,7 @@ async function refreshRows(){
     $('rowsBody').innerHTML = rows.map(r => `<tr>
       <td>${r.tsISO ? new Date(r.tsISO).toLocaleString() : ''}</td>
       <td>${r.className||''}</td><td>${r.seatNumber||''}</td><td>${r.studentName||''}</td>
-      <td>${r.conditionLabel||''}</td><td>${r.groupTitle||''}</td>
+      <td>${r.conditionLabel||''}</td><td>${r.supportLabel||''}</td><td>${r.groupTitle||''}</td>
       <td>${r.scenario||r.stepTitle||''}</td><td>${r.levelStudentLabel||''}</td>
       <td>${(r.promptSent||'').slice(0,60)}</td><td>${(r.aiResponse||'').slice(0,80)}</td>
     </tr>`).join('');
@@ -424,6 +481,11 @@ async function init(){
   $('goalSelect').addEventListener('change', updatePreview);
   $('send').addEventListener('click', send);
   $('reset').addEventListener('click', resetChoice);
+  $('levelIntroContinue').addEventListener('click', ()=>{
+    introDismissed = true;
+    updateLevelStage();
+  });
+  updateLevelStage();
 
   $('toTeacher').addEventListener('click', ()=>{ $('studentView').hidden = true; $('teacherView').hidden = false; });
   $('toStudent').addEventListener('click', ()=>{ $('teacherView').hidden = true; $('studentView').hidden = false; });

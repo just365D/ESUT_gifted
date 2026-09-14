@@ -3,7 +3,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import { STEPS, LEVELS, GROUPS, CLASSES, findStep, findLevel, findGroup, conditionForClass, buildPromptText, buildSystemInstruction } from "./lib/steps.js";
+import { STEPS, LEVELS, GROUPS, CLASSES, findStep, findLevel, findGroup, conditionForClass, supportForClass, buildPromptText, buildSystemInstruction } from "./lib/steps.js";
 import { askGemini } from "./lib/gemini.js";
 import { appendInteractionRow, isSheetsConfigured } from "./lib/sheets.js";
 import { loadInteractions, appendInteractionCache } from "./lib/store.js";
@@ -36,12 +36,14 @@ app.get("/api/levels", (req, res) => {
   res.json(LEVELS.map(l => ({ key: l.key, studentLabel: l.studentLabel, formalName: l.formalName, def: l.def, hint: l.hint })));
 });
 
-// ---------- 班級 → 任務目標類型條件 對照（研究者指派，以班級為分派單位；固定值見 lib/steps.js） ----------
+// ---------- 班級 → 兩個自變項條件 對照（研究者指派，以班級為分派單位；固定值見 lib/steps.js） ----------
 app.get("/api/classes", (req, res) => {
   res.json(CLASSES.map(c => ({
     code: c.code,
     condition: c.condition,
-    conditionLabel: c.condition === "clue" ? "線索任務型" : "完整任務型"
+    conditionLabel: c.condition === "clue" ? "線索任務型" : "完整任務型",
+    support: c.support,
+    supportLabel: c.support === "autonomous" ? "自主式" : "引導式"
   })));
 });
 
@@ -73,6 +75,7 @@ app.post("/api/ask", async (req, res) => {
 
   const group = findGroup(step.groupKey);
   const condition = conditionForClass(className);
+  const support = supportForClass(className);
   const promptSent = buildPromptText(step, level.key, condition);
   const systemInstruction = buildSystemInstruction(step, level.key, condition);
   const tsCreated = Date.now();
@@ -98,6 +101,8 @@ app.post("/api/ask", async (req, res) => {
     studentName: String(studentName).trim(),
     condition,
     conditionLabel: condition === "clue" ? "線索任務型" : "完整任務型",
+    support,
+    supportLabel: support === "autonomous" ? "自主式" : "引導式",
     groupTitle: group ? group.title : "",
     stepId: step.id,
     stepTitle: step.title,
@@ -145,11 +150,11 @@ function csvEscape(v){
 
 app.get("/api/export.csv", requireTeacher, (req, res) => {
   const rows = loadInteractions();
-  const header = ["時間","班級","座號","姓名","任務目標類型條件","關卡","步驟","關卡目標","認知層次(學生按鈕)","認知層次(正式名稱)","送出的訊息","AI回覆","使用模型","是否錯誤"];
+  const header = ["時間","班級","座號","姓名","任務目標類型條件","Prompt選擇支援","關卡","步驟","關卡目標","認知層次(學生按鈕)","認知層次(正式名稱)","送出的訊息","AI回覆","使用模型","是否錯誤"];
   const lines = [header.map(csvEscape).join(",")];
   rows.forEach(r => {
     lines.push([
-      r.tsISO, r.className, r.seatNumber, r.studentName, r.conditionLabel, r.groupTitle, r.stepId, r.scenario,
+      r.tsISO, r.className, r.seatNumber, r.studentName, r.conditionLabel, r.supportLabel, r.groupTitle, r.stepId, r.scenario,
       r.levelStudentLabel, r.levelFormalName, r.promptSent, r.aiResponse, r.model, r.isError ? "是" : "否"
     ].map(csvEscape).join(","));
   });

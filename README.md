@@ -29,7 +29,7 @@ npm install
    ```
    GEMINI_API_KEY=AIzaSyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    ```
-   `GEMINI_MODEL` 保持預設的 `gemini-2.0-flash` 就好（便宜、速度快，很適合這種短文字回覆）。Gemini API 有免費額度，一個班級 30 人、每人問 5～10 次的量通常在免費額度內就夠用；如果全班同一分鐘一起送出可能會撞到免費額度的流量限制，屆時可以到 https://aistudio.google.com/rate-limit 查看，或考慮開啟計費（flash-lite 非常便宜）。
+   `GEMINI_MODEL` 保持預設的 `gemini-flash-lite-latest` 就好（便宜、速度快，很適合這種短文字回覆）。Gemini API 有免費額度，一個班級 30 人、每人問 5～10 次的量通常在免費額度內就夠用；如果全班同一分鐘一起送出可能會撞到免費額度的流量限制，屆時可以到 https://aistudio.google.com/rate-limit 查看，或考慮開啟計費（flash-lite 非常便宜）。
 
 ## 第三步：設定 Google 試算表（研究資料存放處）
 
