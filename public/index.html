@@ -297,9 +297,12 @@ function supportForClass(code){
 function updateLevelStage(){
   const code = $('className').value;
   const support = code ? supportForClass(code) : 'autonomous';
-  const showIntro = support === 'guided' && !introDismissed;
-  $('levelIntro').hidden = !showIntro;
-  $('levelMain').hidden = showIntro;
+  const guided = support === 'guided';
+  // 引導式班級：說明表格會一直留在畫面上（方便邊選邊回頭看），
+  // 按「開始選擇」只是把卡片區塊也打開、把繼續按鈕收起來，不會把表格換掉。
+  $('levelIntro').hidden = !guided;
+  $('levelIntroContinue').hidden = !guided || introDismissed;
+  $('levelMain').hidden = guided && !introDismissed;
 }
 
 function renderGroups(){
