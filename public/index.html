@@ -279,7 +279,7 @@ function fillProfileSelects(){
   $('className').innerHTML = '<option value="">請選擇班級</option>' +
     CLASSES.map(c=>'<option>'+c.code+'</option>').join('');
   $('seatNumber').innerHTML = '<option value="">請選擇座號</option>' +
-    Array.from({length:30},(_,i)=>String(i+1).padStart(2,'0')).map(n=>'<option>'+n+'</option>').join('');
+    Array.from({length:35},(_,i)=>String(i+1).padStart(2,'0')).map(n=>'<option>'+n+'</option>').join('');
   $('className').addEventListener('change', ()=>{
     introDismissed = false; // 換班級時，若新班級是引導式，重新從引導畫面開始
     updateLevelStage();
